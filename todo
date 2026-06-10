@@ -1,0 +1,77 @@
+
+
+Fix: inactive cells wand outer walls
+
+
+
+NEXT MEETING
+- Put it together (Fix bugs) + Theach oli ho to debug
+- Tutor each other 
+- Consider doing optimization
+- Readme
+- Evals
+
+
+
+# do I wanna print another character?
+    You're likely thinking of "Unicode" box-drawing characters — e.g., "┌┬┐├┼┤└┴┘─│" — which give much cleaner walls than plain ASCII plus/minus/pipe. Use Unicode box-drawing (or block) characters for borders and intersections, or heavy/rounded variants for different looks.
+# add printing seed into 
+# convert dict(cell: int) . Cell holds x,y,and seed
+# inactive vs active cells - add them to printing and to themes 
+
+
+how would I add them in, what would bethe most logical way? 
+
+Use a theme layer: define the characters once, keep your rendering logic unchanged, and substitute theme chars when building lines. Steps:
+
+Add a Theme field for box characters (or a separate Unicode_THEME).
+Replace the hardcoded ASCII pieces ("+", "-", "|", " ") in _build_static_lines with theme properties.
+Keep color/RESET handling the same.
+Example minimal Theme (add to your themes module or in code):
+
+python
+
+
+UNICODE_THEME = Theme(
+    WALL="", RESET="",
+    ENTRY="\x1b[32m", EXIT="\x1b[31m", PATH="\x1b[33m",
+    # box drawing
+    CORNER_TL="┌", CORNER_TR="┐", CORNER_BL="└", CORNER_BR="┘",
+    H="─", V="│", T_UP="┴", T_DOWN="┬", T_LEFT="┤", T_RIGHT="├", CROSS="┼",
+)
+Adjust _build_static_lines to use those symbols. Example replacements (conceptual):
+
+Top border: instead of f"{self.theme.WALL}+" and "---+", build using CORNER_TL / CORNER_TR / H:
+start with self.theme.CORNER_TL
+for each cell add self.theme.H*3 and appropriate junction (use CROSS or T_DOWN depending on neighbor)
+Vertical walls: use self.theme.V instead of "|" and horizontal segments use self.theme.H instead of "-".
+For empty gaps use spaces the same width.
+Conservative concrete change pattern (simpler, keeps existing layout):
+
+Replace "+" with a theme.JUNCTION (e.g., "┼"), "-" with theme.H, and "|" with theme.V.
+Keep the same spacing and cell-width logic.
+Small code sketch swapping tokens in your current implementation:
+
+python
+
+
+corner = getattr(self.theme, "JUNCTION", "+")
+h = getattr(self.theme, "H", "-")
+v = getattr(self.theme, "V", "|")
+
+top = f"{v}{corner}"
+for x in range(width):
+    if self.maze[0][x] & NORTH:
+        top += h*3 + corner
+    else:
+        top += "   " + corner
+
+middle = f"{v}{v}"
+# and where you had f" {content} {self.theme.WALL}|{self.theme.RESET}"
+# use f" {content} {v}{self.theme.RESET}"
+Notes:
+
+Unicode box-drawing needs a font/terminal that supports it (most modern ones do).
+Color escape sequences don't affect column width; avoid adding visible extra chars in theme strings.
+You can provide both ASCII and UNICODE themes and let users pick.
+If you want, I can produce a ready-to-drop-in Theme object plus the exact modified build_static_lines code. Which would you prefer?
