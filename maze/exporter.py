@@ -17,6 +17,16 @@ class Exporter:
         self.output_file: str = specs.output_name
         self.path_str: str = self._build_path_str()
         self.maze_hex: str = self._build_grid()
+        self.maze_grid: list[list[int]] = self._build_grid_matrix()
+
+    def _build_grid_matrix(self) -> list[list[int]]:
+        bitmask = self._build_bitmask()
+        lookup = {(c.x, c.y): bit for c, bit in bitmask.items()} 
+        max_x = max(x for x, y in lookup) 
+        max_y = max(y for x, y in lookup) 
+        grid = [[lookup[(x,y)] for x in range(max_x+1)] for y in range(max_y+1)] 
+        
+        return grid
 
     def _build_bitmask(self) -> dict[Cell, int]:
         # separate the concerns
@@ -30,7 +40,7 @@ class Exporter:
             b_direction = self._dir_dict[(-dx, -dy)]
             c_bits[wall.cell_a] |= (1 << a_direction.value[2])
             c_bits[wall.cell_b] |= (1 << b_direction.value[2])
-
+        
         return c_bits
 
     def _build_path_str(self) -> list[str]:
