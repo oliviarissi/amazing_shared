@@ -32,7 +32,7 @@ def generate_maze(
     exporter = Exporter(graph.cell_lookup, maze_raw, path_raw, specs)
     exporter.write_to_file()
 
-    maze = exporter.maze_grid
+    maze = exporter._maze_grid
     path = [(c.x, c.y) for c in path_raw]
     cells = graph.cells.copy()
 

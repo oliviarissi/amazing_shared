@@ -9,8 +9,8 @@ class MazeSpecs(BaseModel, extra='allow'):
     height: int = Field(ge=2, validation_alias='HEIGHT')
     entry_point: tuple[int, int] = Field(validation_alias='ENTRY')
     exit_point: tuple[int, int] = Field(validation_alias='EXIT')
-    output_name: str = Field(min_length=4, pattern=r".*\.txt$",
-                             validation_alias='OUTPUT_FILE')
+    # output_name: str = Field(min_length=4, pattern=r".*\.txt$",
+                            #    validation_alias='OUTPUT_FILE')
     perfect: bool = Field(default=False, validation_alias='PERFECT')
     seed: int | None = Field(default=None, ge=1, validation_alias='SEED')
 

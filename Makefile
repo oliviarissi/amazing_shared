@@ -32,7 +32,6 @@ clean:
 
 clean-venv: clean
 	@echo "Removing virtual env directory"
-	$(VENV)/bin/deactivate
 	rm -rf $(VENV)
 
 lint:
