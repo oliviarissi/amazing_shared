@@ -1,7 +1,7 @@
 
 from collections import deque
-from structs import Cell, Wall
-from graph import Graph
+from src.structs import Cell, Wall
+from src.graph import Graph
 
 
 class BFS():

@@ -1,0 +1,16 @@
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mazegen"
+version = "1.1.0"
+description = "Maze generator and solver"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["pydantic", "numpy"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mazegen*"]

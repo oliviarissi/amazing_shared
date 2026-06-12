@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: mazegen
+Version: 1.1.0
+Summary: Maze generator and solver
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: pydantic
+Requires-Dist: numpy
+
+
+

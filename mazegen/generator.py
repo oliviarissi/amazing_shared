@@ -1,28 +1,42 @@
 from abc import ABC, abstractmethod
 import random
-from graph import Graph
-from structs import Wall, Cell
-from bfs import BFS
+from typing import Any
+from src.graph import Graph
+from src.structs import Wall, Cell, MazeSpecs
+from src.bfs import BFS
 
 
 class MazeGenerator(ABC):
 
+    def _get_graph(self, maze_specs: dict[str, Any]) -> Graph | None:
+        try:
+            valid_maze = MazeSpecs(maze_specs)
+            return Graph(valid_maze)
+        except Exception as e:
+            print(f"Check specified maze details - {e}")
+
     @abstractmethod
-    def generate(self, graph: Graph) -> list[Wall]:
+    def generate(self, maze_specs: dict[str, Any]) -> list[Wall]:
         # algorithm implementation goes here
         pass
 
-    def solve_maze(self, graph: Graph, maze: list[Wall]) -> list[Cell]:
-        solver: BFS = BFS(graph, maze)
-
-        return solver.solve_maze()
+    def solve_maze(self, maze_specs: dict[str, Any]) -> list[Cell] | None:
+        try:
+            graph = self._get_graph(maze_specs)
+            maze = self.generate(graph)
+            solver: BFS = BFS(graph, maze)
+            return solver.solve_maze(maze_specs.entry_point,
+                                     maze_specs.exit_point)
+        except Exception as e:
+            print(f"There was an error, check maze details - {e}")
 
 
 class KruskalGenerator(MazeGenerator):
 
-    def generate(self, graph: Graph) -> list[Wall]:
-        from dsu import DSU
+    def generate(self, maze_specs: dict[str, Any]) -> list[Wall]:
+        from src.dsu import DSU
 
+        graph = self._get_graph(maze_specs)
         maze_walls: list[Wall] = graph.walls.copy()
         active_cells: list[Cell] = [c for c in graph.cells if c.is_active]
         dsu = DSU(active_cells)
@@ -81,8 +95,9 @@ class WilsonGenerator(MazeGenerator):
 
         return path
 
-    def generate(self, graph: Graph) -> list[Wall]:
+    def generate(self, maze_specs: dict[str, Any]) -> list[Wall]:
 
+        graph = self._get_graph(maze_specs)
         lookup_dict: dict[tuple[int, int], Cell] = graph.cell_lookup
         active_cells: list[Cell] = [c for c in graph.cell_lookup.values()
                                     if c.is_active]

@@ -1,5 +1,5 @@
 
-from structs import Wall, Cell, MazeSpecs
+from src.structs import Wall, Cell, MazeSpecs
 import numpy as np
 
 
